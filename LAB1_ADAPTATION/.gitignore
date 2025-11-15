@@ -1,0 +1,21 @@
+# IRMAS Dataset (too large for Git)
+irmas_dataset/
+*.wav
+*.zip
+
+# Model files (large binary files)
+*.h5
+*.hdf5
+
+# Generated outputs
+model_weights/
+feature_maps/
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Large binary exports
+*.bin
