@@ -4,11 +4,11 @@ irmas_dataset/
 *.zip
 
 # Model files (large binary files)
-*.h5
+#*.h5
 *.hdf5
 
 # Generated outputs
-model_weights/
+#model_weights/
 feature_maps/
 logs/
 

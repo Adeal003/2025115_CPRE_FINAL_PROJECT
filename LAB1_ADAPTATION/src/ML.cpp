@@ -19,182 +19,157 @@
 
 namespace ML {
 
-// Build our ML toy model
-Model buildToyModel(const Path modelPath) {
+// Build AudioCNN_IRMAS model for musical instrument classification
+Model buildAudioCNN_IRMAS(const Path modelPath) {
     Model model;
-    logInfo("--- Building Toy Model ---");
+    logInfo("--- Building AudioCNN_IRMAS Model ---");
 
-    // --- Conv 1: L1 ---
-    // Input shape: 64x64x3
-    // Output shape: 60x60x32
+    // === Convolutional Block 1 ===
+    
+    // Layer 0: conv1_1 (5x5x1x32)
+    // Input: 128x128x1 mel-spectrogram
+    // Output: 124x124x32 (valid padding: 128-5+1=124)
     model.addLayer<ConvolutionalLayer>(
-        LayerParams{sizeof(fp32), {64, 64, 3}},                                    // Input Data
-        LayerParams{sizeof(fp32), {60, 60, 32}},                                   // Output Data
-        LayerParams{sizeof(fp32), {5, 5, 3, 32}, modelPath / "conv1_weights.bin"}, // Weights
-        LayerParams{sizeof(fp32), {32}, modelPath / "conv1_biases.bin"}            // Bias
+        LayerParams{sizeof(fp32), {128, 128, 1}},                                        // Input Data
+        LayerParams{sizeof(fp32), {124, 124, 32}},                                       // Output Data
+        LayerParams{sizeof(fp32), {5, 5, 1, 32}, modelPath / "conv1_1_weights.bin"},   // Weights
+        LayerParams{sizeof(fp32), {32}, modelPath / "conv1_1_bias.bin"}                // Bias
     );
 
-    // --- Conv 2: L2 ---
-    // Input shape: 60x60x32
-    // Output shape: 56x56x32
+    // Layer 1: conv1_2 (5x5x32x32)
+    // Input: 124x124x32
+    // Output: 120x120x32 (124-5+1=120)
     model.addLayer<ConvolutionalLayer>(
-        LayerParams{sizeof(fp32), {60, 60, 32}},                                   // Input Data
-        LayerParams{sizeof(fp32), {56, 56, 32}},                                   // Output Data
-        LayerParams{sizeof(fp32), {5, 5, 32, 32}, modelPath / "conv2_weights.bin"}, // Weights
-        LayerParams{sizeof(fp32), {32}, modelPath / "conv2_biases.bin"}            // Bias
+        LayerParams{sizeof(fp32), {124, 124, 32}},
+        LayerParams{sizeof(fp32), {120, 120, 32}},
+        LayerParams{sizeof(fp32), {5, 5, 32, 32}, modelPath / "conv1_2_weights.bin"},
+        LayerParams{sizeof(fp32), {32}, modelPath / "conv1_2_bias.bin"}
     );
 
-    // --- MPL 1: L3 ---
-    // Input shape: 56x56x32
-    // Output shape: 28x28x32
+    // Layer 2: pool1 (2x2 max pooling)
+    // Input: 120x120x32
+    // Output: 60x60x32
     model.addLayer<MaxPoolingLayer>(
-        LayerParams{sizeof(fp32), {56, 56, 32}},                                   // Input Data
-        LayerParams{sizeof(fp32), {28, 28, 32}},                                   // Output Data
-        LayerParams{sizeof(fp32), {2, 2}}                                          // Pool size
+        LayerParams{sizeof(fp32), {120, 120, 32}},
+        LayerParams{sizeof(fp32), {60, 60, 32}},
+        LayerParams{sizeof(fp32), {2, 2}}
     );
 
-    // --- Conv 3: L4 ---
-    // Input shape: 28x28x32
-    // Output shape: 26x26x64
+    // === Convolutional Block 2 ===
+    
+    // Layer 3: conv2_1 (3x3x32x64)
+    // Input: 60x60x32
+    // Output: 58x58x64 (60-3+1=58)
     model.addLayer<ConvolutionalLayer>(
-        LayerParams{sizeof(fp32), {28, 28, 32}},                                   // Input Data
-        LayerParams{sizeof(fp32), {26, 26, 64}},                                   // Output Data
-        LayerParams{sizeof(fp32), {3, 3, 32, 64}, modelPath / "conv3_weights.bin"}, // Weights
-        LayerParams{sizeof(fp32), {64}, modelPath / "conv3_biases.bin"}            // Bias
+        LayerParams{sizeof(fp32), {60, 60, 32}},
+        LayerParams{sizeof(fp32), {58, 58, 64}},
+        LayerParams{sizeof(fp32), {3, 3, 32, 64}, modelPath / "conv2_1_weights.bin"},
+        LayerParams{sizeof(fp32), {64}, modelPath / "conv2_1_bias.bin"}
     );
 
-    // --- Conv 4: L5 ---
-    // Input shape: 26x26x64
-    // Output shape: 24x24x64
+    // Layer 4: conv2_2 (3x3x64x64)
+    // Input: 58x58x64
+    // Output: 56x56x64 (58-3+1=56)
     model.addLayer<ConvolutionalLayer>(
-        LayerParams{sizeof(fp32), {26, 26, 64}},                                   // Input Data
-        LayerParams{sizeof(fp32), {24, 24, 64}},                                   // Output Data
-        LayerParams{sizeof(fp32), {3, 3, 64, 64}, modelPath / "conv4_weights.bin"}, // Weights
-        LayerParams{sizeof(fp32), {64}, modelPath / "conv4_biases.bin"}            // Bias
+        LayerParams{sizeof(fp32), {58, 58, 64}},
+        LayerParams{sizeof(fp32), {56, 56, 64}},
+        LayerParams{sizeof(fp32), {3, 3, 64, 64}, modelPath / "conv2_2_weights.bin"},
+        LayerParams{sizeof(fp32), {64}, modelPath / "conv2_2_bias.bin"}
     );
 
-    // --- MPL 2: L6 ---
-    // Input shape: 24x24x64
-    // Output shape: 12x12x64
+    // Layer 5: pool2 (2x2 max pooling)
+    // Input: 56x56x64
+    // Output: 28x28x64
     model.addLayer<MaxPoolingLayer>(
-        LayerParams{sizeof(fp32), {24, 24, 64}},                                   // Input Data
-        LayerParams{sizeof(fp32), {12, 12, 64}},                                   // Output Data
-        LayerParams{sizeof(fp32), {2, 2}}                                          // Pool size
+        LayerParams{sizeof(fp32), {56, 56, 64}},
+        LayerParams{sizeof(fp32), {28, 28, 64}},
+        LayerParams{sizeof(fp32), {2, 2}}
     );
 
-    // --- Conv 5: L7 ---
-    // Input shape: 12x12x64
-    // Output shape: 10x10x64
+    // === Convolutional Block 3 ===
+    
+    // Layer 6: conv3_1 (3x3x64x64)
+    // Input: 28x28x64
+    // Output: 26x26x64 (28-3+1=26)
     model.addLayer<ConvolutionalLayer>(
-        LayerParams{sizeof(fp32), {12, 12, 64}},                                   // Input Data
-        LayerParams{sizeof(fp32), {10, 10, 64}},                                   // Output Data
-        LayerParams{sizeof(fp32), {3, 3, 64, 64}, modelPath / "conv5_weights.bin"}, // Weights
-        LayerParams{sizeof(fp32), {64}, modelPath / "conv5_biases.bin"}            // Bias
+        LayerParams{sizeof(fp32), {28, 28, 64}},
+        LayerParams{sizeof(fp32), {26, 26, 64}},
+        LayerParams{sizeof(fp32), {3, 3, 64, 64}, modelPath / "conv3_1_weights.bin"},
+        LayerParams{sizeof(fp32), {64}, modelPath / "conv3_1_bias.bin"}
     );
 
-    // --- Conv 6: L8 ---
-    // Input shape: 10x10x64
-    // Output shape: 8x8x128
+    // Layer 7: conv3_2 (3x3x64x128)
+    // Input: 26x26x64
+    // Output: 24x24x128 (26-3+1=24)
     model.addLayer<ConvolutionalLayer>(
-        LayerParams{sizeof(fp32), {10, 10, 64}},                                   // Input Data
-        LayerParams{sizeof(fp32), {8, 8, 128}},                                    // Output Data
-        LayerParams{sizeof(fp32), {3, 3, 64, 128}, modelPath / "conv6_weights.bin"}, // Weights
-        LayerParams{sizeof(fp32), {128}, modelPath / "conv6_biases.bin"}           // Bias
+        LayerParams{sizeof(fp32), {26, 26, 64}},
+        LayerParams{sizeof(fp32), {24, 24, 128}},
+        LayerParams{sizeof(fp32), {3, 3, 64, 128}, modelPath / "conv3_2_weights.bin"},
+        LayerParams{sizeof(fp32), {128}, modelPath / "conv3_2_bias.bin"}
     );
 
-    // --- MPL 3: L9 ---
-    // Input shape: 8x8x128
-    // Output shape: 4x4x128
+    // Layer 8: pool3 (2x2 max pooling)
+    // Input: 24x24x128
+    // Output: 12x12x128
     model.addLayer<MaxPoolingLayer>(
-        LayerParams{sizeof(fp32), {8, 8, 128}},                                    // Input Data
-        LayerParams{sizeof(fp32), {4, 4, 128}},                                    // Output Data
-        LayerParams{sizeof(fp32), {2, 2}}                                          // Pool size
+        LayerParams{sizeof(fp32), {24, 24, 128}},
+        LayerParams{sizeof(fp32), {12, 12, 128}},
+        LayerParams{sizeof(fp32), {2, 2}}
     );
 
-    // --- Flatten: L10 ---
-    // Input shape: 4x4x128 = 2048
-    // Output shape: 2048 (flattened)
+    // === Fully Connected Layers ===
+    
+    // Layer 9: flatten
+    // Input: 12x12x128 = 18,432
+    // Output: 18,432
     model.addLayer<FlattenLayer>(
-        LayerParams{sizeof(fp32), {4, 4, 128}},                                    // Input Data (4D)
-        LayerParams{sizeof(fp32), {2048}}                                          // Output Data (1D flattened)
+        LayerParams{sizeof(fp32), {12, 12, 128}},
+        LayerParams{sizeof(fp32), {18432}}
     );
 
-    // --- Dense 1: L11 ---
-    // Input shape: 2048
-    // Output shape: 256
+    // Layer 10: fc1 (Dense 18432 -> 256)
+    // Note: ReLU activation is applied in Dense layer
     model.addLayer<DenseLayer>(
-        LayerParams{sizeof(fp32), {2048}},                                         // Input Data (flattened)
-        LayerParams{sizeof(fp32), {256}},                                          // Output Data
-        LayerParams{sizeof(fp32), {2048, 256}, modelPath / "dense1_weights.bin"}, // Weights
-        LayerParams{sizeof(fp32), {256}, modelPath / "dense1_biases.bin"}         // Bias
+        LayerParams{sizeof(fp32), {18432}},
+        LayerParams{sizeof(fp32), {256}},
+        LayerParams{sizeof(fp32), {18432, 256}, modelPath / "fc1_weights.bin"},
+        LayerParams{sizeof(fp32), {256}, modelPath / "fc1_bias.bin"}
     );
 
-    // --- Dense 2: L12 ---
-    // Input shape: 256
-    // Output shape: 200
+    // Note: Dropout is skipped during inference
+
+    // Layer 11: fc2 (Dense 256 -> 10 classes)
+    // Output: raw logits (no activation yet)
     model.addLayer<DenseLayer>(
-        LayerParams{sizeof(fp32), {256}},                                          // Input Data
-        LayerParams{sizeof(fp32), {200}},                                          // Output Data
-        LayerParams{sizeof(fp32), {256, 200}, modelPath / "dense2_weights.bin"},  // Weights
-        LayerParams{sizeof(fp32), {200}, modelPath / "dense2_biases.bin"}         // Bias
+        LayerParams{sizeof(fp32), {256}},
+        LayerParams{sizeof(fp32), {10}},
+        LayerParams{sizeof(fp32), {256, 10}, modelPath / "fc2_weights.bin"},
+        LayerParams{sizeof(fp32), {10}, modelPath / "fc2_bias.bin"}
     );
 
-    // --- Softmax 1: L13 ---
-    // Input shape: 200
-    // Output shape: 200
+    // Layer 12: softmax (for classification probabilities)
     model.addLayer<SoftmaxLayer>(
-        LayerParams{sizeof(fp32), {200}},                                          // Input Data
-        LayerParams{sizeof(fp32), {200}}                                           // Output Data
+        LayerParams{sizeof(fp32), {10}},
+        LayerParams{sizeof(fp32), {10}}
     );
 
+    logInfo("AudioCNN_IRMAS Model built successfully!");
+    logInfo("Total layers: 13 (8 Conv, 3 MaxPool, 1 Flatten, 2 Dense, 1 Softmax)");
+    
     return model;
 }
 
-void runBasicTest(const Model& model, const Path& basePath) {
-    logInfo("--- Running Basic Test ---");
-
-    // Load an image
-    LayerData img = {{sizeof(fp32), {64, 64, 3}, "./data/image_0.bin"}};
-    img.loadData();
-
-    // Compare images
-    std::cout << "Comparing image 0 to itself (max error): " << img.compare<fp32>(img) << std::endl
-              << "Comparing image 0 to itself (T/F within epsilon " << ML::Config::EPSILON << "): " << std::boolalpha
-              << img.compareWithin<fp32>(img, ML::Config::EPSILON) << std::endl;
-
-    // Test again with a modified copy
-    std::cout << "\nChange a value by 0.1 and compare again" << std::endl;
-    
-    LayerData imgCopy = img;
-    imgCopy.get<fp32>(0) += 0.1;
-
-    // Compare images
-    img.compareWithinPrint<fp32>(imgCopy);
-
-    // Test again with a modified copy
-    log("Change a value by 0.1 and compare again...");
-    imgCopy.get<fp32>(0) += 0.1;
-
-    // Compare Images
-    img.compareWithinPrint<fp32>(imgCopy);
-}
-
-void runLayerTest(const std::size_t layerNum, const Model& model, const Path& basePath) {
-    logInfo(std::string("--- Running Layer Test ") + std::to_string(layerNum) + "---");
+void runLayerTest(const std::size_t layerNum, const Model& model, const Path& basePath, const LayerData& inputData) {
+    logInfo(std::string("--- Running Layer Test ") + std::to_string(layerNum) + " ---");
     
     try {
-        // For layer testing, we always start with the original input image
-        // and run inference up to the specified layer
-        LayerData img({sizeof(fp32), {64, 64, 3}, basePath / "image_0.bin"});
-        img.loadData();
-
         Timer timer("Layer Inference");
 
         // Run inference on the model up to the specified layer
         timer.start();
         
         // Start with layer 0
-        model.inferenceLayer(img, 0, Layer::InfType::NAIVE);
+        model.inferenceLayer(inputData, 0, Layer::InfType::NAIVE);
         const LayerData* output = &model[0].getOutputData();
         
         // Run subsequent layers up to layerNum
@@ -205,7 +180,7 @@ void runLayerTest(const std::size_t layerNum, const Model& model, const Path& ba
         
         timer.stop();
 
-        // Debug: Print the output dimensions first
+        // Print the output dimensions
         std::cout << "Layer " << layerNum << " output dimensions: ";
         for (size_t dim : output->getParams().dims) {
             std::cout << dim << " ";
@@ -214,139 +189,120 @@ void runLayerTest(const std::size_t layerNum, const Model& model, const Path& ba
 
         // Load the expected output for this specific layer
         std::string expectedFileName = "layer_" + std::to_string(layerNum) + "_output.bin";
-        Path expectedPath = basePath / "image_0_data" / expectedFileName.c_str();
+        Path expectedPath = basePath / expectedFileName.c_str();
         
-        // Debug output dimensions BEFORE creating LayerData expected
-        std::cout << "Output dimensions: ";
-        for (size_t dim : output->getParams().dims) {
-            std::cout << dim << " ";
-        }
-        std::cout << "(total: " << output->getParams().flat_count() << " elements)" << std::endl;
-        
-        // Check expected file size to infer correct dimensions
+        // Check if expected file exists
         std::ifstream file(expectedPath, std::ios::binary | std::ios::ate);
-        if (file.is_open()) {
-            std::streamsize size = file.tellg();
-            std::cout << "Expected file size: " << size << " bytes (" << size/4 << " elements)" << std::endl;
-            file.close();
-            
-            // Calculate expected elements
-            size_t expectedElements = size / 4;
-            size_t outputElements = output->getParams().flat_count();
-            
-            if (expectedElements != outputElements) {
-                std::cout << "DIMENSION MISMATCH: Output has " << outputElements << " elements, expected " << expectedElements << std::endl;
-                return; // Skip this test
-            }
+        if (!file.is_open()) {
+            std::cout << "Expected output file not found: " << expectedPath << std::endl;
+            std::cout << "Skipping comparison for layer " << layerNum << std::endl;
+            return;
+        }
+        
+        std::streamsize size = file.tellg();
+        std::cout << "Expected file size: " << size << " bytes (" << size/4 << " elements)" << std::endl;
+        file.close();
+        
+        // Calculate expected elements
+        size_t expectedElements = size / 4;
+        size_t outputElements = output->getParams().flat_count();
+        
+        if (expectedElements != outputElements) {
+            std::cout << "DIMENSION MISMATCH: Output has " << outputElements 
+                      << " elements, expected " << expectedElements << std::endl;
+            return;
         }
         
         // Create LayerData for comparison
         LayerData expected(output->getParams(), expectedPath);
-        
-        // Handle dimension mismatch for dense layers by creating a compatible comparison
-        if (layerNum >= 9) {
-            std::cout << "DENSE LAYER DETECTED: Attempting flexible comparison..." << std::endl;
-            // For dense layers, try to load with matching element count
-            std::ifstream file(expectedPath, std::ios::binary | std::ios::ate);
-            if (file.is_open()) {
-                std::streamsize size = file.tellg();
-                file.close();
-                size_t expectedElements = size / 4;
-                size_t outputElements = output->getParams().flat_count();
-                
-                if (expectedElements == outputElements) {
-                    std::cout << "Element counts match (" << expectedElements << "), comparing raw data..." << std::endl;
-                    // Both have same element count, can compare raw data
-                    std::vector<fp32> expectedData(expectedElements);
-                    std::ifstream dataFile(expectedPath, std::ios::binary);
-                    dataFile.read(reinterpret_cast<char*>(expectedData.data()), size);
-                    dataFile.close();
-                    
-                    const fp32* outputRaw = static_cast<const fp32*>(output->raw());
-                    
-                    // Calculate cosine similarity manually
-                    double dotProduct = 0.0, normA = 0.0, normB = 0.0;
-                    for (size_t i = 0; i < expectedElements; ++i) {
-                        dotProduct += outputRaw[i] * expectedData[i];
-                        normA += outputRaw[i] * outputRaw[i];
-                        normB += expectedData[i] * expectedData[i];
-                    }
-                    double similarity = dotProduct / (std::sqrt(normA) * std::sqrt(normB));
-                    std::cout << "Manual Cosine Similarity: " << (similarity * 100.0) << "% (" << similarity << ")" << std::endl;
-                    return;
-                } else {
-                    std::cout << "Element count mismatch: output=" << outputElements << ", expected=" << expectedElements << std::endl;
-                    return;
-                }
-            }
-        }
-        
         expected.loadData();
         
         // Compare the outputs
         output->compareWithinPrint<fp32>(expected);
+        
     } catch (const std::exception& e) {
         std::cout << "Layer " << layerNum << " test failed: " << e.what() << std::endl;
     }
 }
 
-void runInferenceTest(const Model& model, const Path& basePath) {
-    logInfo("--- Running Inference Test ---");
-
-    // Load the input image
-    LayerData img(model[0].getInputParams(), basePath / "image_0.bin");
-    img.loadData();
+void runInferenceTest(const Model& model, const LayerData& inputData) {
+    logInfo("--- Running Full Inference Test ---");
 
     Timer timer("Full Inference");
 
     // Run full inference on the model
     timer.start();
-    const LayerData& output = model.inference(img, Layer::InfType::NAIVE);
+    const LayerData& output = model.inference(inputData, Layer::InfType::NAIVE);
     timer.stop();
 
-    // Compare against the final layer output (layer 11 for our 12-layer model, 0-indexed)
-    // The model has 13 layers (0-12), so the final output should be layer_11_output.bin
-    try {
-        LayerData expected(model.getOutputLayer().getOutputParams(), basePath / "image_0_data" / "layer_11_output.bin");
-        expected.loadData();
-        output.compareWithinPrint<fp32>(expected);
-    } catch (const std::exception& e) {
-        std::cout << "Full inference test failed: " << e.what() << std::endl;
-        std::cout << "Note: Expected final layer output file may not exist." << std::endl;
+    // Print output dimensions
+    std::cout << "\nFinal output dimensions: ";
+    for (size_t dim : output.getParams().dims) {
+        std::cout << dim << " ";
+    }
+    std::cout << "(total: " << output.getParams().flat_count() << " elements)" << std::endl;
+    
+    // Print top-5 predictions with instrument names
+    const char* instrumentNames[] = {
+        "Cello", "Clarinet", "Flute", "Acoustic Guitar", "Electric Guitar",
+        "Organ", "Piano", "Saxophone", "Trumpet", "Violin"
+    };
+    
+    const size_t numClasses = output.getParams().flat_count();
+    std::cout << "\nTop-5 predictions:" << std::endl;
+    std::vector<std::pair<fp32, size_t>> predictions;
+    for (size_t i = 0; i < numClasses; ++i) {
+        predictions.push_back({output.get<fp32>(i), i});
+    }
+    std::sort(predictions.begin(), predictions.end(), std::greater<>());
+    
+    for (size_t i = 0; i < std::min(size_t(5), numClasses); ++i) {
+        std::cout << "  " << (i+1) << ". " << instrumentNames[predictions[i].second]
+                  << " (class " << predictions[i].second << "): " 
+                  << (predictions[i].first * 100.0f) << "%" << std::endl;
     }
 }
 
-void runAllLayerTests(const Model& model, const Path& basePath) {
+void runAllLayerTests(const Model& model, const Path& basePath, const LayerData& inputData) {
     logInfo("--- Running All Layer Tests ---");
     
-    // Test all layers to see complete verification results
-    for (std::size_t layerNum = 0; layerNum <= 11; ++layerNum) {
-        runLayerTest(layerNum, model, basePath);
+    // Test all layers (0-12 for AudioCNN_IRMAS)
+    size_t numLayers = model.getNumLayers();
+    for (std::size_t layerNum = 0; layerNum < numLayers; ++layerNum) {
+        runLayerTest(layerNum, model, basePath, inputData);
     }
 }
 
 void runTests() {
-    // Base input data path (determined from current directory of where you are running the command)
-    Path basePath("data");  // May need to be altered for zedboards loading from SD Cards
-
-    // Build the model and allocate the buffers
-    Model model = buildToyModel(basePath / "model");
+    logInfo("========================================");
+    logInfo("  AudioCNN_IRMAS Model Testing");
+    logInfo("  Musical Instrument Classification");
+    logInfo("========================================");
+    
+    // Base paths for audio model
+    Path basePath("data");
+    Path modelPath = basePath / "model_weights";
+    Path featureMapsPath = basePath / "feature_maps";
+    
+    // Build the AudioCNN_IRMAS model
+    Model model = buildAudioCNN_IRMAS(modelPath);
     model.allocLayers();
-
-    // Run some framework tests as an example of loading data
-    runBasicTest(model, basePath);
-
-    // Run all layer tests to verify tensor shapes
-    runAllLayerTests(model, basePath);
-
-    // Run all layer tests (uncomment the line below to test all layers 0-11)
-    // runAllLayerTests(model, basePath);
-
-    // Run an end-to-end inference test
-    runInferenceTest(model, basePath);
-
+    
+    // Load a test mel-spectrogram (128x128x1)
+    logInfo("Loading test mel-spectrogram...");
+    LayerData melSpec({sizeof(fp32), {128, 128, 1}, basePath / "test_input.bin"});
+    melSpec.loadData();
+    logInfo("Test input loaded successfully!");
+    
+    // Run layer-by-layer tests
+    runAllLayerTests(model, featureMapsPath, melSpec);
+    
+    // Run full inference test
+    runInferenceTest(model, melSpec);
+    
     // Clean up
     model.freeLayers();
+    
     std::cout << "\n\n----- ML::runTests() COMPLETE -----\n";
 }
 

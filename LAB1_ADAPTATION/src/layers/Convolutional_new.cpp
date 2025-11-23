@@ -28,7 +28,7 @@ namespace ML
 
         size_t U = 1; // Stride
 
-       // size_t H = inputDims[0];
+        size_t H = inputDims[0];
         size_t W = inputDims[1];
         size_t C = inputDims[2];
 

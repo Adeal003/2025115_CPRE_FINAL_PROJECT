@@ -6,26 +6,26 @@
 ## Week 1: Dataset Preparation & Initial Model Training
 
 ### Dataset Selection & Setup
-- [ ] Choose between NSynth or IRMAS dataset
-- [ ] Download and organize dataset on HPC cluster
-- [ ] Verify dataset integrity and structure
-- [ ] Document dataset characteristics (number of classes, samples per class, audio format)
+- [ Done - IRMAS ] Choose between NSynth or IRMAS dataset
+- [ DONE ] Download and organize dataset on HPC cluster
+- [ DONE ] Verify dataset integrity and structure
+- [ DONE ] Document dataset characteristics (number of classes, samples per class, audio format)
 
 ### Audio Preprocessing Pipeline
-- [ ] Install required Python libraries (librosa, TensorFlow, NumPy, etc.)
-- [ ] Set up Python virtual environment (`python3 -m venv project_venv`)
-- [ ] Implement audio loading functions
-- [ ] Implement spectrogram generation pipeline
-- [ ] Create visualization functions for spectrograms
-- [ ] Test preprocessing on sample audio files
-- [ ] Document preprocessing parameters (FFT size, hop length, etc.)
+- [DONE ] Install required Python libraries (librosa, TensorFlow, NumPy, etc.)
+- [DONE ] Set up Python virtual environment (`python3 -m venv project_venv`)
+- [DONE ] Implement audio loading functions
+- [ DONE] Implement spectrogram generation pipeline
+- [ DONE] Create visualization functions for spectrograms
+- [ DONE ] Test preprocessing on sample audio files
+- [ DONE ] Document preprocessing parameters (FFT size, hop length, etc.)
 
 ### Initial Model Development
-- [ ] Adapt CNN architecture for audio spectrograms
-- [ ] Define model layers (Conv2D, ReLU, MaxPooling, Dense, Softmax)
-- [ ] Implement data augmentation (if applicable)
-- [ ] Set up training/validation/test split
-- [ ] Create Jupyter notebook for training pipeline
+- [ DONE] Adapt CNN architecture for audio spectrograms
+- [ DONE] Define model layers (Conv2D, ReLU, MaxPooling, Dense, Softmax)
+- [DONE ] Implement data augmentation (if applicable)
+- [DONE  ] Set up training/validation/test split
+- [ DONE ] Create Jupyter notebook for training pipeline
 
 ### Checkpoint: Dataset ready, preprocessing working, model architecture defined
 
@@ -34,28 +34,28 @@
 ## Week 2: Model Training & Profiling
 
 ### Model Training
-- [ ] Train initial model on GPU VM (cpre587-f25-*.ece.iastate.edu)
-- [ ] Experiment with different batch sizes
-- [ ] Monitor training progress (loss, accuracy curves)
-- [ ] Validate model performance on test set
-- [ ] Document final hyperparameters
-- [ ] Save trained model weights
+- [DONE ] Train initial model on GPU VM (cpre587-f25-*.ece.iastate.edu)
+- [ DONE] Experiment with different batch sizes
+- [DONE ] Monitor training progress (loss, accuracy curves)
+- [DONE ] Validate model performance on test set
+- [ DONE] Document final hyperparameters
+- [ DONE] Save trained model weights
 
 ### Model Profiling with TensorBoard
-- [ ] Set up TensorBoard profiling
-- [ ] Profile single inference latency
-- [ ] Profile batch inference throughput
-- [ ] Analyze layer-wise computation time
-- [ ] Identify performance bottlenecks
-- [ ] Export profiling results and visualizations
-- [ ] Document findings in notebook
+- [DONE ] Set up TensorBoard profiling
+- [DONE ] Profile single inference latency
+- [DONE ] Profile batch inference throughput
+- [ DONE] Analyze layer-wise computation time
+- [DONE ] Identify performance bottlenecks
+- [DONE ] Export profiling results and visualizations
+- [DONE ] Document findings in notebook
 
 ### Model Export
-- [ ] Export trained weights as binary files
-- [ ] Export biases as binary files
-- [ ] Generate test vectors (input audio → intermediate features → output)
-- [ ] Save intermediate feature maps for validation
-- [ ] Verify exported data integrity
+- [DONE ] Export trained weights as binary files
+- [ DONE] Export biases as binary files
+- [ DONE] Generate test vectors (input audio → intermediate features → output)
+- [ DONE] Save intermediate feature maps for validation
+- [DONE ] Verify exported data integrity
 
 ### Checkpoint: Trained model achieving target accuracy, profiling complete
 
