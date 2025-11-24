@@ -8,7 +8,7 @@ irmas_dataset/
 *.hdf5
 
 # Generated outputs
-#model_weights/
+# model_weights/
 feature_maps/
 logs/
 
