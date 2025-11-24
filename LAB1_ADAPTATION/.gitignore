@@ -9,7 +9,7 @@ irmas_dataset/
 
 # Generated outputs
 # model_weights/
-feature_maps/
+# feature_maps/
 logs/
 
 # Python cache
