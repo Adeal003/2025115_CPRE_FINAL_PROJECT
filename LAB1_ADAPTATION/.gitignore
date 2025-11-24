@@ -8,8 +8,8 @@ irmas_dataset/
 *.hdf5
 
 # Generated outputs
-#model_weights/
-feature_maps/
+# model_weights/
+# feature_maps/
 logs/
 
 # Python cache
