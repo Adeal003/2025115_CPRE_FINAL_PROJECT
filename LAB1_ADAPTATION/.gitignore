@@ -18,4 +18,4 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Large binary exports
-*.bin
+# *.bin
