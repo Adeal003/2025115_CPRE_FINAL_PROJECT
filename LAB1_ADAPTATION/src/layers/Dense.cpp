@@ -57,13 +57,13 @@ namespace ML
             }
 
             // Apply ReLU activation only for hidden layers (not the final layer before Softmax)
-            // The final dense layer typically has 200 outputs (for classification)
+            // The final dense layer has 10 outputs (for 10 instrument classes)
             // Hidden dense layers have other sizes (like 256)
-            if (outputSize != 200) {
+            if (outputSize != 10) {
                 // This is a hidden layer, apply ReLU
                 sum = std::max(0.0f, sum);
             }
-            // For the final layer (outputSize == 200), don't apply ReLU
+            // For the final layer (outputSize == 10), don't apply ReLU
 
             // Store result in output
             output.get<fp32>(out_idx) = sum;
