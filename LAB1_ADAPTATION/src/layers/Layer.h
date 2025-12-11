@@ -308,7 +308,8 @@ template <typename T> float LayerData::compare(const LayerData& other) const {
         std::cout << "Zero Magnitude Vector Comparison" << std::endl;
     }
     else {
-        cosine_similarity = dot_product / (std::max(a_magnitude_sq, b_magnitude_sq));
+        // Correct cosine similarity formula: cos(θ) = (A·B) / (||A|| * ||B||)
+        cosine_similarity = dot_product / (std::sqrt(a_magnitude_sq) * std::sqrt(b_magnitude_sq));
     }
     
     return cosine_similarity;

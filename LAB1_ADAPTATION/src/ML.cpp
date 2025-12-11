@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 #include "Config.h"
 #include "Model.h"
@@ -179,6 +180,15 @@ void runLayerTest(const std::size_t layerNum, const Model& model, const Path& ba
         }
         
         timer.stop();
+        
+        // Debug: Print first few values for problematic layers
+        if (layerNum == 6 || layerNum == 7) {
+            std::cout << "First 10 output values: ";
+            for (size_t i = 0; i < std::min(size_t(10), output->getParams().flat_count()); i++) {
+                std::cout << output->get<fp32>(i) << " ";
+            }
+            std::cout << std::endl;
+        }
 
         // Print the output dimensions
         std::cout << "Layer " << layerNum << " output dimensions: ";
@@ -217,6 +227,15 @@ void runLayerTest(const std::size_t layerNum, const Model& model, const Path& ba
         LayerData expected(output->getParams(), expectedPath);
         expected.loadData();
         
+        // Debug: Print first few expected values for problematic layers
+        if (layerNum == 6 || layerNum == 7) {
+            std::cout << "First 10 expected values: ";
+            for (size_t i = 0; i < std::min(size_t(10), expected.getParams().flat_count()); i++) {
+                std::cout << expected.get<fp32>(i) << " ";
+            }
+            std::cout << std::endl;
+        }
+        
         // Compare the outputs
         output->compareWithinPrint<fp32>(expected);
         
@@ -254,7 +273,7 @@ void runInferenceTest(const Model& model, const LayerData& inputData) {
     for (size_t i = 0; i < numClasses; ++i) {
         predictions.push_back({output.get<fp32>(i), i});
     }
-    std::sort(predictions.begin(), predictions.end(), std::greater<>());
+    std::sort(predictions.begin(), predictions.end(), std::greater<std::pair<fp32, size_t>>());
     
     for (size_t i = 0; i < std::min(size_t(5), numClasses); ++i) {
         std::cout << "  " << (i+1) << ". " << instrumentNames[predictions[i].second]
